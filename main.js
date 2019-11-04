@@ -1,10 +1,11 @@
 var { app, BrowserWindow, Tray, Menu } = require('electron')
 var path = require('path')
 var url = require('url')
+const notifier = require('node-notifier');
 
 let iconpath
-const notifier = require('node-notifier');
-var win
+let win
+let alertCount = 0
 
 function createWindow() {
    win = new BrowserWindow({ width: 800, height: 600 })
@@ -30,6 +31,7 @@ function createWindow() {
             appIcon.destroy()
             win.destroy()
             app.quit()
+            notifier.removeAllListeners()
          }
       }
    ])
@@ -59,4 +61,16 @@ function createWindow() {
    return false;
 }
 
-app.on('ready', createWindow)
+function setAlerts() {
+   alertCount++;
+   notifier.notify({
+      title: 'Repated Alert',
+      message: 'Count: ' + alertCount,
+      icon: iconpath
+   })
+}
+
+app.on('ready', () => {
+   createWindow()
+   setInterval(() => setAlerts(), 5000);
+})
