@@ -1,18 +1,13 @@
 var { app, BrowserWindow, Tray, Menu } = require('electron')
 var path = require('path')
-var url = require('url')
 const notifier = require('node-notifier');
 
-let iconpath
-let win
-let alertCount = 0
+let iconpath, win, alertCount = 0
 
 function createWindow() {
    win = new BrowserWindow({ width: 800, height: 600 })
 
-   win.loadURL(url.format({
-      pathname: path.join(__dirname, 'index.html'),
-   }))
+   win.loadFile('index.html')
 
    if (process.platform === 'darwin') {
       iconpath = path.join(__dirname, '/images/mac-icon.png')
@@ -32,11 +27,11 @@ function createWindow() {
       },
       {
          label: 'Exit', click: function () {
+            notifier.removeAllListeners()
             app.isQuiting = true
             appIcon.destroy()
             win.destroy()
             app.quit()
-            notifier.removeAllListeners()
          }
       }
    ])
@@ -56,23 +51,25 @@ function createWindow() {
       }
       win.hide()
 
-      notifier.notify({
-         title: 'New Message',
-         message: 'Your application is running in background',
-         icon: iconpath
-      })
+      notify('New message', 'Your application is running in background')
    })
 
    return false;
 }
 
-function setAlerts() {
-   alertCount++;
+function notify(title, message) {
    notifier.notify({
-      title: 'Repated Alert',
-      message: 'Count: ' + alertCount,
+      title: title,
+      message: message,
       icon: iconpath
+   }, function () {
+      win.show()
    })
+}
+
+function setAlerts() {
+   alertCount++
+   notify('Repated Alert', 'Count: ' + alertCount)
 }
 
 app.on('ready', () => {
