@@ -1,4 +1,4 @@
-var { app, BrowserWindow, Tray, Menu, Notification } = require('electron')
+var { app, BrowserWindow, Tray, Menu } = require('electron')
 var path = require('path')
 var url = require('url')
 
@@ -14,12 +14,15 @@ function createWindow() {
    }))
 
    var appIcon = new Tray(iconpath)
+   appIcon.setToolTip('Hello World');
 
    var contextMenu = Menu.buildFromTemplate([
       {
          label: 'Exit', click: function () {
             app.isQuiting = true
-            app.exit();
+            appIcon.destroy()
+            win.destroy()
+            app.quit()
          }
       }
    ])
@@ -37,11 +40,11 @@ function createWindow() {
       notifier.notify({
          title: 'New Message',
          message: 'Your application is running in background',
-         icon: iconpath,
-         sound: true,
-         wait: true
+         icon: iconpath
       })
    })
+
+   return false;
 }
 
 app.on('ready', createWindow)
