@@ -2,16 +2,23 @@ var { app, BrowserWindow, Tray, Menu } = require('electron')
 var path = require('path')
 var url = require('url')
 
-var iconpath = path.join(__dirname, '/images/icon.png')
+let iconpath
 const notifier = require('node-notifier');
 var win
 
 function createWindow() {
-   win = new BrowserWindow({ width: 800, height: 600, icon: iconpath })
+   win = new BrowserWindow({ width: 800, height: 600 })
 
    win.loadURL(url.format({
       pathname: path.join(__dirname, 'index.html'),
    }))
+
+   if (process.platform === 'darwin') {
+      iconpath = path.join(__dirname, '/images/mac-icon.png')
+   }
+   else {
+      iconpath = path.join(__dirname, '/images/win-icon.png')
+   }
 
    var appIcon = new Tray(iconpath)
    appIcon.setToolTip('Hello World');
@@ -29,12 +36,17 @@ function createWindow() {
 
    appIcon.setContextMenu(contextMenu)
 
-   appIcon.on('click', function () {
+   appIcon.on('double-click', function () {
       win.show()
    });
 
    win.on('close', function (event) {
       event.preventDefault()
+
+      if (process.platform === 'darwin') {
+         app.dock.hide()
+         appIcon.setPressedImage(iconpath)
+      }
       win.hide()
 
       notifier.notify({
