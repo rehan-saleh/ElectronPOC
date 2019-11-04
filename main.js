@@ -26,6 +26,11 @@ function createWindow() {
 
    var contextMenu = Menu.buildFromTemplate([
       {
+         label: 'Show', click: function () {
+            win.show()
+         }
+      },
+      {
          label: 'Exit', click: function () {
             app.isQuiting = true
             appIcon.destroy()
