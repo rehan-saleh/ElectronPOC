@@ -17,7 +17,7 @@ function createWindow() {
 
    var contextMenu = Menu.buildFromTemplate([
       {
-         label: 'Quit', click: function () {
+         label: 'Exit', click: function () {
             app.isQuiting = true
             app.exit();
          }
@@ -36,10 +36,11 @@ function createWindow() {
 
       notifier.notify({
          title: 'New Message',
-         message: 'Your application is running in background', 
-         icon: iconpath
-      });
-
+         message: 'Your application is running in background',
+         icon: iconpath,
+         sound: true,
+         wait: true
+      })
    })
 }
 
