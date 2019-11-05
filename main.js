@@ -1,20 +1,19 @@
-var { app, BrowserWindow, Tray, Menu } = require('electron')
-var path = require('path')
-const notifier = require('node-notifier');
+const { app, BrowserWindow, Tray, Menu, Notification } = require('electron')
+const path = require('path')
 
 let iconpath, win, alertCount = 0
 
 function createWindow() {
-   win = new BrowserWindow({ width: 800, height: 600 })
-
-   win.loadFile('index.html')
-
    if (process.platform === 'darwin') {
-      iconpath = path.join(__dirname, '/images/mac-icon.png')
+      iconpath = path.join(__dirname, '/assets/icons/mac/icon.ico')
    }
    else {
-      iconpath = path.join(__dirname, '/images/win-icon.png')
+      iconpath = path.join(__dirname, '/assets/icons/win/icon.ico')
    }
+
+   win = new BrowserWindow({ width: 800, height: 600, icon: iconpath })
+
+   win.loadFile("./index.html");
 
    var appIcon = new Tray(iconpath)
    appIcon.setToolTip('Hello World');
@@ -27,7 +26,6 @@ function createWindow() {
       },
       {
          label: 'Exit', click: function () {
-            notifier.removeAllListeners()
             app.isQuiting = true
             appIcon.destroy()
             win.destroy()
@@ -57,14 +55,18 @@ function createWindow() {
    return false;
 }
 
+app.setAppUserModelId("com.electron.poc")
+
 function notify(title, message) {
-   notifier.notify({
+   const notification = {
       title: title,
-      message: message,
+      body: message,
       icon: iconpath
-   }, function () {
-      win.show()
-   })
+   }
+
+   const appNotification = new Notification(notification)
+   appNotification.on('click', function () { win.show() })
+   appNotification.show()
 }
 
 function setAlerts() {
@@ -74,5 +76,5 @@ function setAlerts() {
 
 app.on('ready', () => {
    createWindow()
-   setInterval(() => setAlerts(), 5000);
+   setInterval(() => setAlerts(), 5000)
 })
